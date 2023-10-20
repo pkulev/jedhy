@@ -2,11 +2,17 @@
 
 ;; * Imports
 
-(require [jedhy.macros [*]])
-(import [jedhy.macros [*]])
+(import itertools [repeat filterfalse :as remove])
+
+(require jedhy.macros *)
+(import jedhy.macros *)
 
 (import inspect
         hy)
+(require hyrule *)
+(import hyrule *)
+(import hyrule [flatten])
+(import toolz [juxt drop first second compose])
 
 ;; * Parameters
 

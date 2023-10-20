@@ -2,13 +2,15 @@
 
 ;; * Imports
 
-(require [hy.extra.anaphoric [*]])
+(require hyrule *)
+(import hyrule *)
 
-(import functools
-        [toolz.curried :as tz]
-
-        [hy.lex [unmangle
-                 mangle :as unfixed-mangle]])
+(import itertools [starmap]
+        functools
+        toolz [last]
+        toolz.curried :as tz
+        hy [unmangle
+            mangle :as unfixed-mangle])
 
 ;; * Hy Overwrites
 

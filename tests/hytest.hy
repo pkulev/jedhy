@@ -1,3 +1,4 @@
+(require hyrule [->>])
 (import pytest)
 
 

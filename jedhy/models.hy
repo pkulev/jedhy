@@ -2,26 +2,25 @@
 
 ;; * Imports
 
-(require [jedhy.macros [*]])
-(import [jedhy.macros [*]])
-(import builtins
-
-        hy
-        hy.compiler
+(require jedhy.macros *
+         hyrule *)
+(import jedhy.macros *)
+(import hy
         hy.macros
-        [hy.compiler [-special-form-compilers :as -compile-table]]
+        ;; hy.compiler [-special-form-compilers :as -compile-table]
 
-        ;; Below imports populate --macros-- for Namespace
-        [hy.core.language [*]]
-        [hy.core.macros [*]])
+        ;; Below imports populate _hy_macros for Namespace
+        hy.core *
+        hy.core.macros *
+        hyrule *)
 
 ;; * Fixes
 
 ;; See this issue for below #1467: https://github.com/hylang/hy/issues/1467
 (hy.eval `(import hy.macros))
-(hy.eval `(require [hy.extra.anaphoric [*]]))
+(hy.eval `(require hyrule.anaphoric *))
 ;; Overwrite Hy's mangling
-(import [jedhy.macros [mangle]])
+;(import jedhy.macros mangle)
 
 ;; * Namespace
 

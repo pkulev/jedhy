@@ -1,11 +1,11 @@
-(require [jedhy.macros [*]])
-(import [jedhy.macros [*]])
-(require [tests.hytest [*]])
-(import [tests.hytest [*]])
+(require jedhy.macros *)
+(import jedhy.macros *)
+(require tests.hytest *)
+(import tests.hytest *)
 
-(import [jedhy.inspection [Signature
-                           Inspect
-                           builtin-docs-to-lispy-docs]])
+(import jedhy.inspection [Signature
+                          Inspect
+                          builtin-docs-to-lispy-docs])
 
 ;; * Argspec Extraction
 ;; ** Maximal Cases

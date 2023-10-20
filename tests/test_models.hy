@@ -1,11 +1,11 @@
-(require [jedhy.macros [*]])
-(import [jedhy.macros [*]])
-(require [tests.hytest [*]])
-(import [tests.hytest [*]])
+(require jedhy.macros *)
+(import jedhy.macros *)
+(require tests.hytest *)
+(import tests.hytest *)
 
-(import [jedhy.models [Candidate
-                       Namespace
-                       Prefix]])
+(require hyrule [->>] :readers [%])
+
+(import jedhy.models [Candidate Namespace Prefix])
 
 ;; * Namespace
 ;; ** Components
@@ -227,7 +227,7 @@
   (assert= "<module itertools>"
            (-> "itertools" (Candidate (Namespace :locals- (locals))) (.annotate)))
 
-  (import [itertools :as it])
+  (import itertools :as it)
   (assert= "<module it>"
            (-> "it" (Candidate (Namespace :locals- (locals))) (.annotate))))
 

@@ -2,13 +2,13 @@
 
 ;; * Imports
 
-(require [jedhy.macros [*]])
-(import [jedhy.macros [*]])
+(require jedhy.macros *)
+(import jedhy.macros *)
 
-(import [jedhy.inspection [Inspect]]
-        [jedhy.models [Candidate
-                       Namespace
-                       Prefix]])
+(import jedhy.inspection [Inspect]
+        jedhy.models [Candidate
+                      Namespace
+                      Prefix])
 
 ;; * API
 

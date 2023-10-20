@@ -28,7 +28,7 @@ See ~jedhy.api~, the simple entry point.
 (setv jedhy (jedhy.api.API))
 
 ;; Add some stuff to namespace
-(import [numpy :as np])
+(import numpy :as np)
 (import itertools)
 (defclass Foo [object] "A class\nDetails..." (defn --init-- [self x y]))
 (defmacro foo-macro [x])
