@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "jedhy"
+version = "1.0.0"
+description = "Autocompletion and introspection tools for Hy."
+authors = ["Eric Kaschalk <ekaschalk@gmail.com>", "Pavel Kulyov <kulyov.pavel@gmail.com>"]
+license = "GPLv3"
+readme = "README.org"
+
+repository = "https://github.com/hylang/jedhy"
+homepage = "https://github.com/hylang/jedhy"
+documentation = "https://github.com/hylang/jedhy"
+
+keywords = ["hy", "lisp", "completion", "introspection", "tools"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Lisp",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+hy = "^0.27.0"
+toolz = "^0.12.0"
+hyrule = "^0.4.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+poethepoet = "^0.24.1"
+
+[tool.poe.tasks.test]
+help = "Run all the tests."
+cmd = "poetry run pytest tests/"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
