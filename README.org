@@ -30,14 +30,14 @@ See ~jedhy.api~, the simple entry point.
 ;; Add some stuff to namespace
 (import numpy :as np)
 (import itertools)
-(defclass Foo [object] "A class\nDetails..." (defn --init-- [self x y]))
+(defclass Foo [object] "A class\nDetails..." (defn __init__ [self x y]))
 (defmacro foo-macro [x])
 
-(jedhy.set-namespace :locals- (locals) :macros- --macros--)
+(jedhy.set-namespace :locals- (locals) :macros- _hy_macros)
 
 ;; COMPLETION
 (jedhy.complete "pr")     ; print
-(jedhy.complete "print.") ; print.--call--, print.--str--, ...
+(jedhy.complete "print.") ; print.__call__, print.__str__, ...
 (jedhy.complete "np.a")   ; np.add, np.array, ...
 (jedhy.complete "foo-")   ; foo-macro
 

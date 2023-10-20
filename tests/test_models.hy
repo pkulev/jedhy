@@ -21,7 +21,7 @@
   (assert-not-in "foo-macro"
                  (. (Namespace) macros))
   (assert-in "foo-macro"
-             (. (Namespace :macros- --macros--) macros)))
+             (. (Namespace :macros- _hy_macros) macros)))
 
 
 (defn test-namespace-imported-macros []
@@ -81,9 +81,9 @@
 
 
 (defn test-completion-method-attributes []
-  (assert-in "print.--call--"
+  (assert-in "print.__call__"
              (.complete (Prefix "print.")))
-  (assert-in "print.--call--"
+  (assert-in "print.__call__"
              (.complete (Prefix "print.__c"))))
 
 
@@ -109,7 +109,7 @@
 
 
 (defn test-completion-candidate-doesnt-exist-with-attr-prefix []
-  (assert= (,)
+  (assert= #()
            (.complete (Prefix "gibberish." (Namespace)))))
 
 ;; * Candidates
@@ -119,7 +119,7 @@
   (assert (->> "doesn't exist"
              Candidate
              (.compiler?)
-             none?)))
+             (is None))))
 
 ;; ** Shadows
 
@@ -131,18 +131,18 @@
             all))
   (assert (->> "doesn't exist"
             shadow?
-            none?)))
+            (is None))))
 
 ;; ** Python
 
 (defn test-candidate-evaled-fails []
-  (assert (none? (-> "doesn't exist" Candidate (.evaled?)))))
+  (assert (is (-> "doesn't exist" Candidate (.evaled?)) None)))
 
 (defn test-candidate-evaled-builtins []
   (assert= print (-> "print" Candidate (.evaled?))))
 
 (defn test-candidate-evaled-methods []
-  (assert= print.--call-- (-> "print.--call--" Candidate (.evaled?))))
+  (assert= print.__call__ (-> "print.__call__" Candidate (.evaled?))))
 
 (defn test-candidate-evaled-modules []
   (import builtins)
@@ -154,10 +154,10 @@
 ;; ** Attributes
 
 (defn test-candidate-attributes-fails []
-  (assert (none? (-> "doesn't exist" Candidate (.attributes)))))
+  (assert (is (-> "doesn't exist" Candidate (.attributes)) None)))
 
 (defn test-candidate-attributes-builtin []
-  (assert-all-in ["--str--" "--call--"]
+  (assert-all-in ["__str__" "__call__"]
                  (-> "print" Candidate (.attributes))))
 
 (defn test-candidate-attributes-module []
@@ -168,8 +168,8 @@
                    (.attributes))))
 
 (defn test-candidate-attributes-nested []
-  (assert-all-in ["--str--" "--call--"]
-                 (-> "print.--call--" Candidate (.attributes))))
+  (assert-all-in ["__str__" "__call__"]
+                 (-> "print.__call__" Candidate (.attributes))))
 
 ;; ** Namespacing
 
@@ -182,23 +182,24 @@
 
 (defn test-candidate-namespace-locals []
   (defclass AClass [])
-  (assert (none?
+  (assert (is (-> "AClass"
+                  Candidate
+                  (.attributes))
+              None))
+  (assert (is
             (-> "AClass"
-              Candidate
-              (.attributes))))
-  (assert (none?
-            (-> "AClass"
-              (Candidate (Namespace :globals- (globals)))
-              (.attributes))))
-  (assert-in "--doc--"
+                (Candidate (Namespace :globals- (globals)))
+                (.attributes))
+            None))
+  (assert-in "__doc__"
              (-> "AClass"
-               (Candidate (Namespace :locals- (locals)))
-               (.attributes)))
+                 (Candidate (Namespace :locals- (locals)))
+                 (.attributes)))
 
   (setv doesnt-exist 1)
   (assert (-> "doesnt-exist"
-            (Candidate (Namespace :locals- (locals)))
-            (.evaled?))))
+              (Candidate (Namespace :locals- (locals)))
+              (.evaled?))))
 
 ;; ** Annotations
 

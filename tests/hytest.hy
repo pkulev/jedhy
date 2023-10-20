@@ -18,19 +18,18 @@
 
 ;; * Pytest Fixtures
 
-(defmacro deffixture [fn-name docstring params &rest body]
+(defmacro deffixture [fn-name docstring params #* body]
   "Pytest parametrize reader."
-  `(with-decorator
-     (pytest.fixture :params ~params :scope "module")
-     (defn ~fn-name [request]
-       ~docstring
-       (setv it request.param)
-       ~@body)))
 
-(defmacro with-fixture [fixture fn-name args &rest body]
+  `(defn [(pytest.fixture :params ~params :scope "module")] ~fn-name [request]
+     ~docstring
+     (setv it request.param)
+     ~@body))
+
+(defmacro with-fixture [fixture fn-name args #* body]
   `(defn ~fn-name [~fixture]
      (setv ~args ~fixture)
      ~@body))
 
-(defmacro assert-raises [error &rest code]
+(defmacro assert-raises [error #* code]
   `(with [(pytest.raises ~error)] ~@code))

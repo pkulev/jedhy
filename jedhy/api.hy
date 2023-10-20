@@ -12,19 +12,19 @@
 
 ;; * API
 
-(defclass API [object]
-  (defn --init-- [self &optional globals- locals- macros-]
+(defclass API []
+  (defn __init__ [self [globals- None] [locals- None] [macros- None]]
     (self.set-namespace globals- locals- macros-)
 
     (setv self.-cached-prefix None))
 
-  (defn set-namespace [self &optional globals- locals- macros-]
+  (defn set-namespace [self [globals- None] [locals- None] [macros- None]]
     "Rebuild namespace for possibly given `globals-`, `locals-`, and `macros-`.
 
 Typically, the values passed are:
   globals- -> (globals)
   locals-  -> (locals)
-  macros-  -> --macros--"
+  macros-  -> _hy_macros"
     (setv self.namespace (Namespace globals- locals- macros-)))
 
   (defn complete [self prefix-str]

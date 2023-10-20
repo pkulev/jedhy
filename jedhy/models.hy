@@ -24,36 +24,36 @@
 
 ;; * Namespace
 
-(defclass Namespace [object]
-  (defn --init-- [self &optional globals- locals- macros-]
+(defclass Namespace []
+  (defn __init__ [self [globals- None] [locals- None] [macros- None]]
     ;; Components
     (setv self.globals       (or globals- (globals)))
     (setv self.locals        (or locals- (locals)))
-    (setv self.macros        (tz.keymap unmangle (or macros- --macros--)))
+    (setv self.macros        (tz.keymap unmangle (or macros- _hy_macros)))
     (setv self.compile-table (self.-collect-compile-table))
     (setv self.shadows       (self.-collect-shadows))
 
     ;; Collected
     (setv self.names (self.-collect-names)))
 
-  #@(staticmethod
-      (defn -to-names [key]
-        "Function for converting keys (strs, functions, modules...) to names."
-        (unmangle (if (instance? str key)
-                      key
-                      key.--name--))))
+  (defn [staticmethod] -to-names [key]
+    "Function for converting keys (strs, functions, modules...) to names."
+    (unmangle (if (isinstance key str)
+                  key
+                  key.__name__)))
 
   (defn -collect-compile-table [self]
     "Collect compile table as dict."
-    (->> -compile-table
+    {}
+    #_(->> -compile-table
        (tz.keymap self.-to-names)))
 
   (defn -collect-shadows [self]
     "Collect shadows as a list, purely for annotation checks."
-    (->> hy.core.shadow
-      dir
-      (map self.-to-names)
-      tuple))
+    (->> hy.pyops
+         dir
+         (map self.-to-names)
+         tuple))
 
   (defn -collect-names [self]
     "Collect all names from all places."
@@ -81,23 +81,23 @@
 
 ;; * Candidate
 
-(defclass Candidate [object]
-  (defn --init-- [self symbol &optional namespace]
+(defclass Candidate []
+  (defn __init__ [self symbol [namespace None]]
     (setv self.symbol    (unmangle symbol))
     (setv self.mangled   (mangle symbol))
     (setv self.namespace (or namespace (Namespace))))
 
-  (defn --str-- [self]
+  (defn __str__ [self]
     self.symbol)
 
-  (defn --repr-- [self]
+  (defn __repr__ [self]
     (.format "Candidate<(symbol={}>)" self.symbol))
 
-  (defn --eq-- [self other]
-    (when (instance? Candidate other)
+  (defn __eq__ [self other]
+    (when (isinstance other Candidate)
       (= self.symbol other.symbol)))
 
-  (defn --bool-- [self]
+  (defn __bool__ [self]
     (bool self.symbol))
 
   (defn compiler? [self]
@@ -135,44 +135,31 @@
     (when obj
       (->> obj dir (map unmangle) tuple)))
 
-  #@(staticmethod
-      (defn -translate-class [klass]
-        "Return annotation given a name of a class."
-        (cond [(in klass ["function" "builtin_function_or_method"])
-               "def"]
-              [(= klass "type")
-               "class"]
-              [(= klass "module")
-               "module"]
-              [True
-               "instance"])))
+  (defn [staticmethod] -translate-class [klass]
+    "Return annotation given a name of a class."
+    (cond (in klass ["function" "builtin_function_or_method"]) "def"
+          (= klass "type") "class"
+          (= klass "module") "module"
+          True "instance"))
 
   (defn annotate [self]
     "Return annotation for a candidate."
     (setv obj (self.evaled?))
-    (setv obj? (not (none? obj)))  ; Obj could be instance of bool
+    (setv obj? (is-not obj None))  ; Obj could be instance of bool
 
     ;; Shadowed takes first priority but compile table takes last priority
-    (setv annotation (cond [(self.shadow?)
-                            "shadowed"]
-
-                           [obj?
-                            (self.-translate-class obj.--class--.--name--)]
-
-                           [(.compiler? self)
-                            "compiler"]
-
-                           [(.macro? self)
-                            "macro"]))
-
+    (setv annotation (cond (self.shadow?) "shadowed"
+                           obj? (self.-translate-class obj.__class__.__name__)
+                           (.compiler? self) "compiler"
+                           (.macro? self) "macro"))
     (.format "<{} {}>" annotation self)))
 
 ;; * Prefix
 
-(defclass Prefix [object]
+(defclass Prefix []
   "A completion candidate."
 
-  (defn --init-- [self prefix &optional namespace]
+  (defn __init__ [self prefix [namespace None]]
     (setv self.prefix prefix)
     (setv self.namespace (or namespace (Namespace)))
 
@@ -181,34 +168,28 @@
 
     (setv self.completions (tuple)))
 
-  (defn --repr-- [self]
+  (defn __repr__ [self]
     (.format "Prefix<(prefix={})>" self.prefix))
 
-  #@(staticmethod
-      (defn -prefix->candidate [prefix namespace]
-        (->> (.split prefix ".")
-             butlast
-             (.join ".")
-             (Candidate :namespace namespace))))
+  (defn [staticmethod] -prefix->candidate [prefix namespace]
+    (->> (.split prefix ".")
+         butlast
+         (.join ".")
+         (Candidate :namespace namespace)))
 
-  #@(staticmethod
-      (defn -prefix->attr-prefix [prefix]
-        "Get prefix as str of everything after last dot if a dot is there."
-        (->> (.split prefix ".")
-           last
-           unmangle
-           ;; TODO since 0.15 below line shouldnt be needed
-           (#%(if (= %1 "_") "-" %1)))))
+  (defn [staticmethod] -prefix->attr-prefix [prefix]
+    "Get prefix as str of everything after last dot if a dot is there."
+    (->> (.split prefix ".")
+         last
+         unmangle))
 
-  #@(property
-      (defn has-attr? [self]
-        "Does prefix reference an attr?"
-        (in "." self.prefix)))
+  (defn [property] has-attr? [self]
+    "Does prefix reference an attr?"
+    (in "." self.prefix))
 
-  #@(property
-      (defn obj? [self]
-        "Is the prefix's candidate an object?"
-        (bool (.get-obj self.candidate))))
+  (defn [property] obj? [self]
+    "Is the prefix's candidate an object?"
+    (bool (.get-obj self.candidate)))
 
   (defn complete-candidate [self completion]
     "Given a potential string `completion`, attach to candidate."
@@ -216,7 +197,7 @@
         (+ (str self.candidate) "." completion)
         completion))
 
-  (defn complete [self &optional cached-prefix]
+  (defn complete [self [cached-prefix None]]
     "Get candidates for a given Prefix."
     ;; Short circuit the case: "1+nonsense.real-attr" eg. "foo.--prin"
     (when (and self.has-attr?  ; The and ordering here matters for speed
@@ -232,6 +213,6 @@
                                    self.namespace.names)))
 
     (->> self.completions
-       (filter #f(str.startswith self.attr-prefix))
+       (filter (f (str.startswith self.attr-prefix)))
        (map self.complete-candidate)
        tuple)))
